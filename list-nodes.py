@@ -9,6 +9,15 @@ password = ""
 fileName = ""
 port = ""
 
+agentTypes = {"MACHINE_AGENT": "Machine Agent",
+              "APP_AGENT": "Java Agent",
+              "DOT_NET_APP_AGENT": ".Net Agent",
+              "PYTHON_APP_AGENT": "Python Agent",
+              "PHP_APP_AGENT": "PHP Agent",
+              "NODEJS_APP_AGENT": "Node.js Agent",
+              "GOLANG_SDK": "Go Agent",
+              "NATIVE_SDK": "Native SDK"}
+
 usage = "usage: %prog [options] controller username password"
 
 parser = OptionParser(usage=usage)
@@ -69,7 +78,7 @@ except:
     print ("Could not open output file " + fileName + ".")
     exit(1)
 
-fieldnames = ['Application', 'Tier', 'AgentType', 'Node']
+fieldnames = ['Application', 'Tier', 'Agent Type', 'Node Name', 'Machine Name']
 filewriter = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',', quotechar='"')
 filewriter.writeheader()
 
@@ -99,11 +108,16 @@ for app in apps:
             print ("Could not parse the nodes for tier " + tier['name'] + " in application " + app['name'] + ".")
 
         for node in nodes:
+            if node['agentType'] in agentTypes:
+                agentType = agentTypes[node['agentType']]
+            else:
+                agentType = node['agentType']
             try:
                 filewriter.writerow({'Application': app['name'],
                                     'Tier': tier['name'],
-                                    'AgentType': node['agentType'],
-                                    'Node': node['machineName']})
+                                    'Agent Type': agentType,
+                                    'Node Name': node['name'],
+                                    'Machine Name': node['machineName']})
             except:
                 print ("Could not write to the output file " + fileName + ".")
                 csvfile.close()
